@@ -219,6 +219,64 @@ button {
   color: #061018;
 }
 
+.game-top-nav {
+  position: sticky;
+  top: calc(var(--safe-top) + 8px);
+  z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) auto minmax(96px, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(7, 16, 25, 0.86);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.nav-back-button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-weight: 900;
+}
+
+.nav-back-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(136, 255, 212, 0.16);
+  color: var(--mint);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.game-top-title {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.game-top-actions {
+  justify-self: end;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .stat-pill,
 .tag {
   display: inline-flex;
@@ -318,11 +376,7 @@ button {
 .stealth-button {
   min-width: 140px;
   min-height: 48px;
-  background: transparent;
-  color: transparent;
-  border: 0;
-  box-shadow: none;
-  opacity: 0;
+  opacity: 1;
 }
 
 .stealth-button:active {
@@ -375,6 +429,10 @@ button {
   align-items: center;
 }
 
+.video-topbar.game-top-nav {
+  flex: 0 0 auto;
+}
+
 .video-center {
   align-self: center;
   width: min(92vw, 480px);
@@ -392,14 +450,16 @@ button {
 .word-stage {
   min-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
   padding: 24px;
 }
 
 .word-stage-card {
   width: min(92vw, 700px);
+  margin: auto;
   padding: 20px;
   border-radius: 30px;
   background: rgba(5, 16, 26, 0.22);
@@ -1446,16 +1506,22 @@ button {
 
 .reward {
   min-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
-  display: grid;
-  place-items: center;
   text-align: center;
   position: relative;
   z-index: 1;
 }
 
+.reward-shell {
+  min-height: calc(100vh - var(--safe-top) - var(--safe-bottom) - 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .reward-burst {
   position: relative;
   width: min(92vw, 420px);
+  margin: auto;
   padding: 28px;
   border-radius: 32px;
   background: linear-gradient(
@@ -1579,6 +1645,19 @@ button {
 }
 
 @media (max-width: 460px) {
+  .game-top-nav {
+    grid-template-columns: auto 1fr auto;
+    border-radius: 24px;
+  }
+
+  .game-top-title {
+    font-size: 0.82rem;
+  }
+
+  .nav-back-button {
+    padding: 9px 11px;
+  }
+
   .stat-grid,
   .mood-grid {
     grid-template-columns: 1fr;

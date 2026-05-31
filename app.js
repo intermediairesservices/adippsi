@@ -1022,6 +1022,19 @@ function renderLanguageSwitch() {
   `;
 }
 
+function renderGameTopNav(title, actions = "") {
+  return `
+    <nav class="game-top-nav" aria-label="${t("backToMenu")}">
+      <button class="nav-back-button" data-action="go-menu">
+        <span class="nav-back-icon">&lt;</span>
+        <span>${t("backToMenu")}</span>
+      </button>
+      <div class="game-top-title">${title}</div>
+      <div class="game-top-actions">${actions}</div>
+    </nav>
+  `;
+}
+
 function renderOnboardingPanel() {
   if (state.app.onboardingDismissed) {
     return "";
@@ -1215,8 +1228,12 @@ function renderGame1() {
       ></video>
 
       <section class="video-overlay">
-        <div class="video-topbar">
-          <button class="button-ghost glass stealth-button" data-action="go-menu">${t("backToMenu")}</button>
+        <div class="video-topbar game-top-nav glass">
+          <button class="nav-back-button" data-action="go-menu">
+            <span class="nav-back-icon">&lt;</span>
+            <span>${t("backToMenu")}</span>
+          </button>
+          <div class="game-top-title">Video flow</div>
           <button class="button-soft glass" data-action="toggle-reduced-motion">
             ${state.app.reducedMotion ? t("normalMotion") : t("calmMotion")}
           </button>
@@ -1226,7 +1243,7 @@ function renderGame1() {
 
         <div class="video-bottombar">
           <div></div>
-          <button class="button-soft glass stealth-button" data-action="game1-next-video">${t("changeVideo")}</button>
+          <button class="button-soft glass" data-action="game1-next-video">${t("changeVideo")}</button>
         </div>
       </section>
     </main>
@@ -1237,6 +1254,7 @@ function renderGame2() {
   if (state.game2.stage === "playback") {
     return `
       <main class="app-shell screen word-stage">
+        ${renderGameTopNav("Word stream recall")}
         <section class="word-stage-card">
           <p class="word-caption">${escapeHtml(state.game2.playbackCaption)}</p>
           <div class="word-display">${escapeHtml(state.game2.visibleWord || " ")}</div>
@@ -1249,6 +1267,7 @@ function renderGame2() {
     return `
       <main class="app-shell screen">
         <section class="stack">
+          ${renderGameTopNav("Word stream recall")}
           <header class="hero">
             <div class="eyebrow">Game 02</div>
             <h1 class="title" style="font-size: clamp(1.9rem, 7vw, 2.8rem);">
@@ -1286,6 +1305,7 @@ function renderGame2() {
   return `
     <main class="app-shell screen">
       <section class="stack">
+        ${renderGameTopNav("Word stream recall")}
         <header class="hero">
           ${renderLanguageSwitch()}
           <div class="eyebrow">Game 02</div>
@@ -1347,7 +1367,6 @@ function renderGame2() {
           <button class="button" data-action="game2-start" ${canStartGame2() ? "" : "disabled"}>
             ${t("startGame")}
           </button>
-          <button class="button-ghost" data-action="go-menu">${t("backToMenu")}</button>
         </div>
       </section>
 
@@ -1494,6 +1513,7 @@ function renderGame3() {
         <div class="background-orb orb-top"></div>
         <div class="background-orb orb-bottom"></div>
         <section class="focus-shell">
+          ${renderGameTopNav("Mission flow")}
           <div class="eyebrow">${t("focusMission")}</div>
           <div class="focus-day-label">${getDayLabel(todayDayId)}</div>
 
@@ -1561,14 +1581,17 @@ function renderGame3() {
   if (state.game3.stage === "reward") {
     return `
       <main class="app-shell screen reward game3-screen">
-        <section class="reward-burst">
-          <div class="reward-shard reward-shard-top"></div>
-          <div class="reward-shard reward-shard-left"></div>
-          <div class="reward-shard reward-shard-right"></div>
-          <div class="reward-gem"></div>
-          <div class="eyebrow">${t("missionSecured")}</div>
-          <h1 class="title" style="font-size: clamp(2rem, 8vw, 3rem);">${t("rewardXp")}</h1>
-          <p class="subtitle">${escapeHtml(state.game3.rewardMissionText)}</p>
+        <section class="reward-shell">
+          ${renderGameTopNav("Mission flow")}
+          <div class="reward-burst">
+            <div class="reward-shard reward-shard-top"></div>
+            <div class="reward-shard reward-shard-left"></div>
+            <div class="reward-shard reward-shard-right"></div>
+            <div class="reward-gem"></div>
+            <div class="eyebrow">${t("missionSecured")}</div>
+            <h1 class="title" style="font-size: clamp(2rem, 8vw, 3rem);">${t("rewardXp")}</h1>
+            <p class="subtitle">${escapeHtml(state.game3.rewardMissionText)}</p>
+          </div>
         </section>
       </main>
     `;
@@ -1579,6 +1602,7 @@ function renderGame3() {
       <div class="background-orb orb-top"></div>
       <div class="background-orb orb-bottom"></div>
       <section class="stack game3-board">
+        ${renderGameTopNav("Mission flow")}
         <header class="hero hero-block">
           ${renderLanguageSwitch()}
           <div class="eyebrow">Game 03</div>
@@ -1759,9 +1783,6 @@ function renderGame3() {
           </div>
         </section>
 
-        <div class="board-footer">
-          <button class="button-ghost" data-action="go-menu">${t("backToMenu")}</button>
-        </div>
       </section>
 
       ${renderGame3EditorModal()}
