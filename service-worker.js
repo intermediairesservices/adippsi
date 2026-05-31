@@ -1,4 +1,4 @@
-const CACHE_NAME = "adippsi-pwa-v1";
+const CACHE_NAME = "adippsi-pwa-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -50,6 +50,20 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => caches.match("./index.html"));
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((client) => "focus" in client);
+      if (existing) {
+        return existing.focus();
+      }
+
+      return self.clients.openWindow("./index.html");
     }),
   );
 });

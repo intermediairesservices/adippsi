@@ -7,7 +7,10 @@ const VIDEO_SOURCES = Array.from(
 const GAME2_STORAGE_KEY = "adippsi-web-game2-v1";
 const GAME3_STORAGE_KEY = "adippsi-web-game3-v1";
 const LANGUAGE_STORAGE_KEY = "adippsi-language-v1";
+const SETTINGS_STORAGE_KEY = "adippsi-settings-v1";
+const GA_MEASUREMENT_ID = "G-58KPS97SGG";
 const SUPPORTED_LANGUAGES = ["fr", "en"];
+const REMINDER_DEFAULT_TIME = "09:00";
 
 const GAME2_DEFAULTS_BY_LANGUAGE = {
   fr: {
@@ -103,6 +106,7 @@ const GAME2_WORD_VISIBLE_RATIO = 0.72;
 const GAME2_INTER_PHRASE_PAUSE_MS = 180;
 const GAME2_END_PHRASE_HOLD_MS = 120;
 const HOLD_DURATION_MS = 3000;
+const MAX_TIMEOUT_MS = 2147483647;
 
 const COPY = {
   fr: {
@@ -241,6 +245,58 @@ const COPY = {
     releasedStatus: "Libérée aujourd'hui",
     queuedStatus: "En attente",
     routeSlot: "Emplacement",
+    progressTitle: "Progression",
+    progressSubtitle: "Ton élan réel, sans drama.",
+    completedToday: "Validées aujourd'hui",
+    activeStreak: "Streak actif",
+    totalSecured: "Missions validées",
+    completionRate: "Taux de complétion",
+    level: "Niveau",
+    xp: "XP",
+    nextLevel: "prochain niveau",
+    badges: "Badges",
+    badgeStarter: "Premier lancement",
+    badgeTen: "10 missions",
+    badgeStreak: "3 jours actifs",
+    badgeClean: "Route propre",
+    badgeBuilder: "Architecte hebdo",
+    noBadges: "Les badges arrivent dès les premières validations.",
+    moodBridge: "Mood bridge",
+    nowMood: "Maintenant",
+    nextMood: "Après",
+    moodTired: "fatigué",
+    moodScattered: "dispersé",
+    moodStuck: "bloqué",
+    moodFocus: "focus",
+    moodMemory: "mémoriser",
+    moodAct: "agir",
+    recommended: "Recommandé",
+    openRecommended: "Ouvrir",
+    recommendationGame1: "Video flow pour couper la boucle mentale.",
+    recommendationGame2: "Word stream pour réancrer les objectifs.",
+    recommendationGame3: "Mission flow pour passer en action.",
+    onboardingTitle: "Premier setup",
+    onboardingCopy: "Crée une route du jour, active un rappel, puis valide une mission.",
+    buildFirstRoute: "Créer ma route",
+    skip: "Plus tard",
+    reminders: "Rappels",
+    reminderCopy: "Notification locale pour la prochaine mission du jour.",
+    reminderTime: "Heure",
+    enableReminder: "Activer",
+    disableReminder: "Désactiver",
+    notificationReady: "Rappel actif",
+    notificationBlocked: "Notifications bloquées par le navigateur.",
+    notificationUnsupported: "Notifications non disponibles ici.",
+    reminderScheduled: "Prochain rappel: {time}",
+    reminderOff: "Rappel désactivé",
+    reminderTitle: "Adippsi",
+    reminderBody: "Prochaine mission: {mission}",
+    testReminder: "Tester",
+    visualSafety: "Confort visuel",
+    calmMotion: "Mode doux",
+    normalMotion: "Mode intense",
+    safetyHint: "Réduit contraste, saturation et vitesse de Video flow.",
+    rewardXp: "+25 XP",
     resetListConfirm: "Réinitialiser cette liste ?",
     clearListConfirm: "Supprimer toutes les phrases de cette liste ?",
     removePhraseConfirm: "Supprimer cette phrase ?",
@@ -383,6 +439,58 @@ const COPY = {
     releasedStatus: "Released for today",
     queuedStatus: "Queued",
     routeSlot: "Route slot",
+    progressTitle: "Progress",
+    progressSubtitle: "Your real momentum, without the drama.",
+    completedToday: "Completed today",
+    activeStreak: "Active streak",
+    totalSecured: "Missions secured",
+    completionRate: "Completion rate",
+    level: "Level",
+    xp: "XP",
+    nextLevel: "next level",
+    badges: "Badges",
+    badgeStarter: "First launch",
+    badgeTen: "10 missions",
+    badgeStreak: "3 active days",
+    badgeClean: "Clean route",
+    badgeBuilder: "Weekly architect",
+    noBadges: "Badges appear after your first secured missions.",
+    moodBridge: "Mood bridge",
+    nowMood: "Now",
+    nextMood: "Next",
+    moodTired: "tired",
+    moodScattered: "scattered",
+    moodStuck: "stuck",
+    moodFocus: "focus",
+    moodMemory: "remember",
+    moodAct: "act",
+    recommended: "Recommended",
+    openRecommended: "Open",
+    recommendationGame1: "Video flow to interrupt the mental loop.",
+    recommendationGame2: "Word stream to anchor goals again.",
+    recommendationGame3: "Mission flow to move into action.",
+    onboardingTitle: "First setup",
+    onboardingCopy: "Create today's route, enable a reminder, then secure one mission.",
+    buildFirstRoute: "Build my route",
+    skip: "Later",
+    reminders: "Reminders",
+    reminderCopy: "Local notification for the next mission of the day.",
+    reminderTime: "Time",
+    enableReminder: "Enable",
+    disableReminder: "Disable",
+    notificationReady: "Reminder active",
+    notificationBlocked: "Notifications are blocked by the browser.",
+    notificationUnsupported: "Notifications are not available here.",
+    reminderScheduled: "Next reminder: {time}",
+    reminderOff: "Reminder off",
+    reminderTitle: "Adippsi",
+    reminderBody: "Next mission: {mission}",
+    testReminder: "Test",
+    visualSafety: "Visual comfort",
+    calmMotion: "Calm mode",
+    normalMotion: "Intense mode",
+    safetyHint: "Reduces Video flow contrast, saturation, and speed.",
+    rewardXp: "+25 XP",
     resetListConfirm: "Reset this list to the defaults?",
     clearListConfirm: "Remove every phrase from this list?",
     removePhraseConfirm: "Remove this phrase?",
@@ -398,6 +506,12 @@ const state = {
   language: activeLanguage,
   screen: "menu",
   exportDialog: null,
+  app: {
+    ...loadAppSettings(),
+    moodFrom: "tired",
+    moodTo: "act",
+    notice: "",
+  },
   game1: {
     videoIndex: 0,
     ended: false,
@@ -432,9 +546,17 @@ const state = {
 };
 
 let holdIntervalId = null;
+let reminderTimeoutId = null;
+let lastAnalyticsScreenKey = "";
 
 document.addEventListener("click", handleClick);
 document.addEventListener("input", handleInput);
+window.addEventListener("appinstalled", () => {
+  trackEvent("pwa_installed", { install_source: "browser_prompt" });
+});
+window.addEventListener("beforeinstallprompt", () => {
+  trackEvent("pwa_install_prompt_available");
+});
 document.documentElement.lang = state.language;
 registerServiceWorker();
 render();
@@ -470,6 +592,59 @@ function registerServiceWorker() {
   });
 }
 
+function trackEvent(eventName, params = {}) {
+  if (typeof window.gtag !== "function") {
+    return;
+  }
+
+  window.gtag("event", eventName, {
+    send_to: GA_MEASUREMENT_ID,
+    app_name: "adippsi",
+    language: state.language,
+    ...sanitizeAnalyticsParams(params),
+  });
+}
+
+function trackScreenView() {
+  const stage =
+    state.screen === "game2"
+      ? state.game2.stage
+      : state.screen === "game3"
+        ? state.game3.stage
+        : "default";
+  const screenKey = `${state.screen}:${stage}`;
+
+  if (screenKey === lastAnalyticsScreenKey) {
+    return;
+  }
+
+  lastAnalyticsScreenKey = screenKey;
+  trackEvent("screen_view", {
+    screen_name: state.screen,
+    screen_stage: stage,
+  });
+}
+
+function sanitizeAnalyticsParams(params) {
+  return Object.fromEntries(
+    Object.entries(params).flatMap(([key, value]) => {
+      if (value === null || value === undefined) {
+        return [];
+      }
+
+      if (typeof value === "number" || typeof value === "boolean") {
+        return [[key, value]];
+      }
+
+      return [[key, String(value).replace(/\s+/g, "_").slice(0, 64)]];
+    }),
+  );
+}
+
+function getAnalyticsSource(source) {
+  return source || "direct";
+}
+
 function confirmAction(message) {
   try {
     if (typeof window.confirm === "function") {
@@ -492,6 +667,38 @@ function loadLanguage() {
   return SUPPORTED_LANGUAGES.includes(browserLanguage) ? browserLanguage : "fr";
 }
 
+function loadAppSettings() {
+  try {
+    const parsed = JSON.parse(readStorage(SETTINGS_STORAGE_KEY) || "{}");
+    return {
+      reminderEnabled: Boolean(parsed.reminderEnabled),
+      reminderTime:
+        typeof parsed.reminderTime === "string" && /^\d{2}:\d{2}$/.test(parsed.reminderTime)
+          ? parsed.reminderTime
+          : REMINDER_DEFAULT_TIME,
+      reducedMotion: Boolean(parsed.reducedMotion),
+      onboardingDismissed: Boolean(parsed.onboardingDismissed),
+    };
+  } catch (_error) {
+    return {
+      reminderEnabled: false,
+      reminderTime: REMINDER_DEFAULT_TIME,
+      reducedMotion: false,
+      onboardingDismissed: false,
+    };
+  }
+}
+
+function saveAppSettings() {
+  const payload = {
+    reminderEnabled: state.app.reminderEnabled,
+    reminderTime: state.app.reminderTime,
+    reducedMotion: state.app.reducedMotion,
+    onboardingDismissed: state.app.onboardingDismissed,
+  };
+  writeStorage(SETTINGS_STORAGE_KEY, JSON.stringify(payload));
+}
+
 function setLanguage(language) {
   if (!SUPPORTED_LANGUAGES.includes(language) || state.language === language) {
     return;
@@ -501,6 +708,7 @@ function setLanguage(language) {
   activeLanguage = language;
   writeStorage(LANGUAGE_STORAGE_KEY, language);
   document.documentElement.lang = language;
+  trackEvent("language_changed", { selected_language: language });
   render();
 }
 
@@ -736,6 +944,7 @@ function render() {
   syncOrientationPreference();
   app.innerHTML = renderScreen() + renderExportDialog();
   hydrateScreen();
+  trackScreenView();
 }
 
 function syncOrientationPreference() {
@@ -769,6 +978,10 @@ function renderMenu() {
           <h1 class="title">${t("chooseGame")}</h1>
           <p class="subtitle">${t("menuIntro")}</p>
         </header>
+
+        ${renderOnboardingPanel()}
+        ${renderProgressPanel()}
+        ${renderMoodBridge()}
 
         <section class="menu-grid">
           <article class="card stack">
@@ -808,6 +1021,161 @@ function renderLanguageSwitch() {
     </div>
   `;
 }
+
+function renderOnboardingPanel() {
+  if (state.app.onboardingDismissed) {
+    return "";
+  }
+
+  return `
+    <section class="panel onboarding-panel">
+      <div>
+        <div class="eyebrow">${t("onboardingTitle")}</div>
+        <p class="copy">${t("onboardingCopy")}</p>
+      </div>
+      <div class="row">
+        <button class="button" data-action="onboarding-build-route">${t("buildFirstRoute")}</button>
+        <button class="button-ghost" data-action="dismiss-onboarding">${t("skip")}</button>
+      </div>
+    </section>
+  `;
+}
+
+function renderProgressPanel() {
+  const stats = getProgressStats();
+  const badges = getProgressBadges(stats);
+
+  return `
+    <section class="panel stack progress-panel">
+      <div class="row between">
+        <div>
+          <div class="eyebrow">${t("progressTitle")}</div>
+          <h2 class="panel-title">${t("level")} ${stats.level}</h2>
+        </div>
+        <div class="xp-pill">${stats.xp} ${t("xp")}</div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${stats.levelProgress}%;"></div>
+      </div>
+      <div class="muted">${stats.xpToNext} ${t("xp")} ${t("nextLevel")}</div>
+
+      <div class="stat-grid">
+        <div class="metric-tile">
+          <strong>${stats.completedToday}</strong>
+          <span>${t("completedToday")}</span>
+        </div>
+        <div class="metric-tile">
+          <strong>${stats.streak}</strong>
+          <span>${t("activeStreak")}</span>
+        </div>
+        <div class="metric-tile">
+          <strong>${stats.totalDone}</strong>
+          <span>${t("totalSecured")}</span>
+        </div>
+        <div class="metric-tile">
+          <strong>${stats.completionRate}%</strong>
+          <span>${t("completionRate")}</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="eyebrow">${t("badges")}</div>
+        <div class="badge-row">
+          ${
+            badges.length
+              ? badges.map((badge) => `<span class="badge-chip">${badge}</span>`).join("")
+              : `<span class="muted">${t("noBadges")}</span>`
+          }
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderMoodBridge() {
+  const recommendation = getMoodRecommendation();
+  const fromMoods = [
+    { id: "tired", label: t("moodTired") },
+    { id: "scattered", label: t("moodScattered") },
+    { id: "stuck", label: t("moodStuck") },
+  ];
+  const toMoods = [
+    { id: "focus", label: t("moodFocus") },
+    { id: "memory", label: t("moodMemory") },
+    { id: "act", label: t("moodAct") },
+  ];
+
+  return `
+    <section class="panel stack mood-panel">
+      <div class="row between">
+        <div>
+          <div class="eyebrow">${t("moodBridge")}</div>
+          <h2 class="panel-title">${recommendation.title}</h2>
+        </div>
+        <button class="button" data-action="${recommendation.action}" data-source="mood_bridge">${t("openRecommended")}</button>
+      </div>
+
+      <div class="mood-grid">
+        <div>
+          <div class="muted">${t("nowMood")}</div>
+          <div class="segmented-row">
+            ${fromMoods.map((mood) => renderMoodButton("moodFrom", mood)).join("")}
+          </div>
+        </div>
+        <div>
+          <div class="muted">${t("nextMood")}</div>
+          <div class="segmented-row">
+            ${toMoods.map((mood) => renderMoodButton("moodTo", mood)).join("")}
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendation-line">
+        <span>${t("recommended")}</span>
+        <strong>${recommendation.copy}</strong>
+      </div>
+    </section>
+  `;
+}
+
+function renderMoodButton(role, mood) {
+  const active = state.app[role] === mood.id;
+  return `
+    <button
+      class="mood-chip ${active ? "active" : ""}"
+      data-action="select-mood"
+      data-role="${role}"
+      data-mood="${mood.id}"
+    >
+      ${mood.label}
+    </button>
+  `;
+}
+
+function getMoodRecommendation() {
+  if (state.app.moodTo === "memory") {
+    return {
+      title: "Word stream recall",
+      action: "open-game2",
+      copy: t("recommendationGame2"),
+    };
+  }
+
+  if (state.app.moodTo === "focus" || state.app.moodFrom === "scattered") {
+    return {
+      title: "Video flow",
+      action: "open-game1",
+      copy: t("recommendationGame1"),
+    };
+  }
+
+  return {
+    title: "Mission flow",
+    action: "open-game3",
+    copy: t("recommendationGame3"),
+  };
+}
 function renderGame1() {
   const src = VIDEO_SOURCES[state.game1.videoIndex];
   const overlay = state.game1.ended
@@ -836,7 +1204,7 @@ function renderGame1() {
       : "";
 
   return `
-    <main class="video-screen">
+    <main class="video-screen ${state.app.reducedMotion ? "safe-motion" : ""}">
       <video
         id="game1-video"
         src="${src}"
@@ -849,6 +1217,9 @@ function renderGame1() {
       <section class="video-overlay">
         <div class="video-topbar">
           <button class="button-ghost glass stealth-button" data-action="go-menu">${t("backToMenu")}</button>
+          <button class="button-soft glass" data-action="toggle-reduced-motion">
+            ${state.app.reducedMotion ? t("normalMotion") : t("calmMotion")}
+          </button>
         </div>
 
         ${overlay}
@@ -1196,7 +1567,7 @@ function renderGame3() {
           <div class="reward-shard reward-shard-right"></div>
           <div class="reward-gem"></div>
           <div class="eyebrow">${t("missionSecured")}</div>
-          <h1 class="title" style="font-size: clamp(2rem, 8vw, 3rem);">+1</h1>
+          <h1 class="title" style="font-size: clamp(2rem, 8vw, 3rem);">${t("rewardXp")}</h1>
           <p class="subtitle">${escapeHtml(state.game3.rewardMissionText)}</p>
         </section>
       </main>
@@ -1304,6 +1675,8 @@ function renderGame3() {
           </div>
         </section>
 
+        ${renderReminderPanel(nextMission)}
+
         <section class="panel stack">
           <div class="row between">
             <h2 class="panel-title">${t("todayRoute")}</h2>
@@ -1402,6 +1775,35 @@ function renderGame3Segment(stateLabel) {
   if (stateLabel === "active") classes.push("active");
   if (stateLabel === "released") classes.push("released");
   return `<div class="${classes.join(" ")}"></div>`;
+}
+
+function renderReminderPanel(nextMission) {
+  const status = state.app.reminderEnabled
+    ? t("reminderScheduled", { time: state.app.reminderTime })
+    : t("reminderOff");
+
+  return `
+    <section class="panel reminder-panel">
+      <div>
+        <div class="eyebrow">${t("reminders")}</div>
+        <h2 class="panel-title-sm">${status}</h2>
+        <p class="copy">${t("reminderCopy")}</p>
+        ${state.app.notice ? `<p class="notice-text">${escapeHtml(state.app.notice)}</p>` : ""}
+      </div>
+      <div class="reminder-controls">
+        <label class="time-field">
+          <span>${t("reminderTime")}</span>
+          <input class="input" type="time" data-role="reminder-time" value="${escapeAttribute(state.app.reminderTime)}" />
+        </label>
+        <button class="button" data-action="${state.app.reminderEnabled ? "disable-reminder" : "enable-reminder"}">
+          ${state.app.reminderEnabled ? t("disableReminder") : t("enableReminder")}
+        </button>
+        <button class="button-soft" data-action="test-reminder" ${nextMission ? "" : "disabled"}>
+          ${t("testReminder")}
+        </button>
+      </div>
+    </section>
+  `;
 }
 
 function renderGame3Gem(active) {
@@ -1599,6 +2001,8 @@ function renderExportDialog() {
 }
 
 function hydrateScreen() {
+  scheduleMissionReminder();
+
   if (state.screen === "game1") {
     hydrateGame1();
   }
@@ -1620,6 +2024,8 @@ function hydrateGame1() {
   if (!video) {
     return;
   }
+
+  video.playbackRate = state.app.reducedMotion ? 0.65 : 1;
 
   video.onended = () => {
     video.pause();
@@ -1713,6 +2119,103 @@ function clearHoldTimer() {
   }
 }
 
+async function enableMissionReminder() {
+  state.app.notice = "";
+
+  if (!("Notification" in window)) {
+    state.app.notice = t("notificationUnsupported");
+    trackEvent("reminder_enable_failed", { reason: "unsupported" });
+    render();
+    return;
+  }
+
+  const permission =
+    Notification.permission === "default"
+      ? await Notification.requestPermission()
+      : Notification.permission;
+
+  if (permission !== "granted") {
+    state.app.reminderEnabled = false;
+    state.app.notice = t("notificationBlocked");
+    saveAppSettings();
+    trackEvent("reminder_enable_failed", { reason: permission });
+    render();
+    return;
+  }
+
+  state.app.reminderEnabled = true;
+  state.app.notice = t("notificationReady");
+  saveAppSettings();
+  scheduleMissionReminder();
+  trackEvent("reminder_enabled", { reminder_time: state.app.reminderTime });
+  render();
+}
+
+function scheduleMissionReminder() {
+  if (reminderTimeoutId) {
+    window.clearTimeout(reminderTimeoutId);
+    reminderTimeoutId = null;
+  }
+
+  if (!state.app.reminderEnabled) {
+    return;
+  }
+
+  const delay = getReminderDelayMs(state.app.reminderTime);
+  reminderTimeoutId = window.setTimeout(() => {
+    void sendMissionReminder(false);
+    scheduleMissionReminder();
+  }, Math.min(delay, MAX_TIMEOUT_MS));
+}
+
+function getReminderDelayMs(timeValue) {
+  const [hour = 9, minute = 0] = String(timeValue || REMINDER_DEFAULT_TIME)
+    .split(":")
+    .map((part) => Number(part));
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(Number.isFinite(hour) ? hour : 9, Number.isFinite(minute) ? minute : 0, 0, 0);
+
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
+
+  return next.getTime() - now.getTime();
+}
+
+async function sendMissionReminder(isTest) {
+  const snapshot = getCurrentDaySnapshot();
+  const mission = getNextMission(snapshot.tasks);
+  if (!mission || !("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  trackEvent(isTest ? "reminder_test_sent" : "reminder_sent", {
+    pending_count: snapshot.tasks.filter((task) => task.status !== "done").length,
+  });
+
+  const title = t("reminderTitle");
+  const body = t("reminderBody", { mission: mission.text });
+  const options = {
+    body,
+    icon: "./assets/icons/adippsi-192.png",
+    badge: "./assets/icons/adippsi-192.png",
+    tag: isTest ? "adippsi-test-reminder" : "adippsi-mission-reminder",
+  };
+
+  try {
+    const registration = await navigator.serviceWorker?.ready;
+    if (registration?.showNotification) {
+      await registration.showNotification(title, options);
+      return;
+    }
+  } catch (error) {
+    console.warn("[PWA] Service worker notification failed", error);
+  }
+
+  new Notification(title, options);
+}
+
 function handleClick(event) {
   const target = event.target.closest("[data-action]");
 
@@ -1733,6 +2236,56 @@ function handleClick(event) {
     case "set-language":
       setLanguage(target.dataset.language);
       break;
+    case "select-mood":
+      if (["moodFrom", "moodTo"].includes(target.dataset.role)) {
+        state.app[target.dataset.role] = target.dataset.mood;
+        trackEvent("mood_bridge_changed", {
+          mood_from: state.app.moodFrom,
+          mood_to: state.app.moodTo,
+          recommended_game: getMoodRecommendation().title,
+        });
+        render();
+      }
+      break;
+    case "dismiss-onboarding":
+      state.app.onboardingDismissed = true;
+      saveAppSettings();
+      trackEvent("onboarding_dismissed");
+      render();
+      break;
+    case "onboarding-build-route":
+      state.app.onboardingDismissed = true;
+      saveAppSettings();
+      trackEvent("onboarding_route_started");
+      openGame3("onboarding");
+      state.game3.stage = "editor";
+      state.game3.editorDay = getTodayDayId();
+      state.game3.selectedDay = getTodayDayId();
+      state.game3.editorDraft = "";
+      render();
+      break;
+    case "toggle-reduced-motion":
+      state.app.reducedMotion = !state.app.reducedMotion;
+      saveAppSettings();
+      trackEvent("visual_comfort_changed", {
+        reduced_motion: state.app.reducedMotion,
+      });
+      render();
+      break;
+    case "enable-reminder":
+      void enableMissionReminder();
+      break;
+    case "disable-reminder":
+      state.app.reminderEnabled = false;
+      state.app.notice = "";
+      saveAppSettings();
+      scheduleMissionReminder();
+      trackEvent("reminder_disabled");
+      render();
+      break;
+    case "test-reminder":
+      void sendMissionReminder(true);
+      break;
 
     case "go-menu":
       resetGame2Playback();
@@ -1746,13 +2299,13 @@ function handleClick(event) {
       break;
 
     case "open-game1":
-      startGame1();
+      startGame1(false, target.dataset.source);
       break;
     case "open-game2":
-      openGame2();
+      openGame2(target.dataset.source);
       break;
     case "open-game3":
-      openGame3();
+      openGame3(target.dataset.source);
       break;
     case "game1-next-video":
       startGame1(true);
@@ -1800,11 +2353,12 @@ function handleClick(event) {
       toggleGame2Phrase(target.dataset.phrase);
       break;
     case "game2-verify":
+      trackGame2ReviewVerification();
       state.game2.verified = true;
       render();
       break;
     case "game2-finish":
-      openGame3();
+      openGame3("word_stream_finish");
       break;
     case "game2-reset-config":
       resetGame2Playback();
@@ -1915,15 +2469,31 @@ function handleInput(event) {
   if (role === "game3-editor-draft") {
     state.game3.editorDraft = target.value;
   }
+
+  if (role === "reminder-time") {
+    state.app.reminderTime = target.value || REMINDER_DEFAULT_TIME;
+    state.app.notice = "";
+    saveAppSettings();
+    scheduleMissionReminder();
+    trackEvent("reminder_time_changed", {
+      reminder_time: state.app.reminderTime,
+      reminder_enabled: state.app.reminderEnabled,
+    });
+  }
 }
 
-function startGame1(forceNext = false) {
+function startGame1(forceNext = false, source = "direct") {
   resetGame2Playback();
   clearRewardTimeout();
   state.screen = "game1";
   state.game1.ended = false;
   state.game1.autoplayFailed = false;
   state.game1.videoIndex = getNextVideoIndex();
+  trackEvent(forceNext ? "video_flow_changed" : "game_opened", {
+    game_id: "video_flow",
+    source: getAnalyticsSource(source),
+    reduced_motion: state.app.reducedMotion,
+  });
 
   render();
 }
@@ -1971,13 +2541,17 @@ function playCurrentGame1Video() {
   }
 }
 
-function openGame2() {
+function openGame2(source = "direct") {
   state.screen = "game2";
   state.game2.stage = "config";
   state.game2.editorTarget = null;
   state.game2.editorDraft = "";
   state.game2.selectedPhrases = [];
   state.game2.verified = false;
+  trackEvent("game_opened", {
+    game_id: "word_stream_recall",
+    source: getAnalyticsSource(source),
+  });
   render();
 }
 
@@ -2006,6 +2580,12 @@ function startGame2Round() {
   state.game2.selectedPhrases = [];
   state.game2.verified = false;
   state.game2.playbackRunId += 1;
+  trackEvent("word_stream_started", {
+    mode: round.mode,
+    instructions_count: state.game2.instructions.length,
+    objectives_count: state.game2.objectives.length,
+    display_count: round.displaySequence.length,
+  });
   render();
   runGame2Playback(state.game2.playbackRunId);
 }
@@ -2120,6 +2700,14 @@ function addGame2DraftToList() {
     state.game2.objectives = mergeUniquePhrases(state.game2.objectives, parsed);
   }
 
+  trackEvent("word_stream_list_updated", {
+    list_type: state.game2.editorTarget,
+    added_count: parsed.length,
+    total_count:
+      state.game2.editorTarget === "instructions"
+        ? state.game2.instructions.length
+        : state.game2.objectives.length,
+  });
   state.game2.editorDraft = "";
   saveGame2State();
   render();
@@ -2199,6 +2787,26 @@ function toggleGame2Phrase(phrase) {
   }
 
   render();
+}
+
+function trackGame2ReviewVerification() {
+  if (!state.game2.round) {
+    return;
+  }
+
+  const correctCount = state.game2.selectedPhrases.filter((phrase) =>
+    state.game2.round.correctAnswers.includes(phrase),
+  ).length;
+
+  trackEvent("word_stream_review_verified", {
+    mode: state.game2.round.mode,
+    required_count: state.game2.round.requiredSelections,
+    selected_count: state.game2.selectedPhrases.length,
+    correct_count: correctCount,
+    success:
+      correctCount === state.game2.round.requiredSelections &&
+      state.game2.selectedPhrases.length === state.game2.round.requiredSelections,
+  });
 }
 
 function getGame2PhraseStatus(phrase) {
@@ -2341,7 +2949,7 @@ function sleep(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
-function openGame3() {
+function openGame3(source = "direct") {
   clearRewardTimeout();
   syncTodaySnapshot();
   state.screen = "game3";
@@ -2349,14 +2957,21 @@ function openGame3() {
   state.game3.focusMissionId = null;
   state.game3.hasStartedMission = false;
   state.game3.holdProgress = 0;
+  trackEvent("game_opened", {
+    game_id: "mission_flow",
+    source: getAnalyticsSource(source),
+  });
   render();
 }
 
 function getTodayDateKey() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
+  return formatDateKey(new Date());
+}
+
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -2457,6 +3072,77 @@ function getGame3TaskStatusLabel(stateLabel) {
   }
 }
 
+function getProgressStats() {
+  const todaySnapshot = getCurrentDaySnapshot();
+  const entries = Object.entries(state.game3.progressByDate).filter(
+    ([, entry]) => Array.isArray(entry?.tasks) && entry.tasks.length > 0,
+  );
+  const totals = entries.reduce(
+    (acc, [, entry]) => {
+      const done = entry.tasks.filter((task) => task.status === "done").length;
+      const released = entry.tasks.filter((task) => task.status === "released").length;
+      acc.totalDone += done;
+      acc.totalMissions += entry.tasks.length;
+      acc.perfectDays += done > 0 && done + released === entry.tasks.length ? 1 : 0;
+      return acc;
+    },
+    { totalDone: 0, totalMissions: 0, perfectDays: 0 },
+  );
+  const completedToday = todaySnapshot.tasks.filter((task) => task.status === "done").length;
+  const streak = getActiveStreak();
+  const completionRate = totals.totalMissions
+    ? Math.round((totals.totalDone / totals.totalMissions) * 100)
+    : 0;
+  const xp = totals.totalDone * 25 + streak * 15 + totals.perfectDays * 30;
+  const level = Math.floor(xp / 120) + 1;
+  const xpIntoLevel = xp % 120;
+
+  return {
+    ...totals,
+    completedToday,
+    streak,
+    completionRate,
+    xp,
+    level,
+    levelProgress: Math.round((xpIntoLevel / 120) * 100),
+    xpToNext: 120 - xpIntoLevel,
+    weeklyMissions: GAME3_DAY_ORDER.reduce(
+      (total, day) => total + (state.game3.schedule[day.id]?.length || 0),
+      0,
+    ),
+  };
+}
+
+function getActiveStreak() {
+  let streak = 0;
+  let cursor = new Date();
+
+  while (streak < 365) {
+    const dateKey = formatDateKey(cursor);
+    const entry = state.game3.progressByDate[dateKey];
+    const hasDone = entry?.tasks?.some((task) => task.status === "done");
+
+    if (!hasDone) {
+      break;
+    }
+
+    streak += 1;
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 1);
+  }
+
+  return streak;
+}
+
+function getProgressBadges(stats) {
+  const badges = [];
+  if (stats.totalDone >= 1) badges.push(t("badgeStarter"));
+  if (stats.totalDone >= 10) badges.push(t("badgeTen"));
+  if (stats.streak >= 3) badges.push(t("badgeStreak"));
+  if (stats.completionRate >= 80 && stats.totalMissions >= 5) badges.push(t("badgeClean"));
+  if (stats.weeklyMissions >= 14) badges.push(t("badgeBuilder"));
+  return badges;
+}
+
 function syncTodaySnapshot() {
   const dateKey = getTodayDateKey();
   const dayId = getTodayDayId();
@@ -2518,6 +3204,10 @@ function launchGame3Mission() {
   state.game3.hasStartedMission = false;
   state.game3.holdProgress = 0;
   state.game3.stage = "focus";
+  trackEvent("mission_started", {
+    pending_count: snapshot.tasks.filter((task) => task.status !== "done").length,
+    total_count: snapshot.tasks.length,
+  });
   render();
 }
 
@@ -2533,6 +3223,12 @@ function completeFocusedMission(missionId) {
 
   mission.status = "done";
   saveGame3State();
+  trackEvent("mission_completed", {
+    completed_today: snapshot.tasks.filter((task) => task.status === "done").length,
+    total_today: snapshot.tasks.length,
+    xp_awarded: 25,
+    completion_method: "hold",
+  });
   state.game3.focusMissionId = null;
   state.game3.hasStartedMission = false;
   state.game3.holdProgress = 0;
@@ -2567,6 +3263,9 @@ function moveFocusedMissionToLater() {
 
   mission.status = "later";
   saveGame3State();
+  trackEvent("mission_deferred", {
+    pending_count: snapshot.tasks.filter((task) => task.status !== "done").length,
+  });
   state.game3.focusMissionId = null;
   state.game3.hasStartedMission = false;
   state.game3.holdProgress = 0;
@@ -2585,6 +3284,9 @@ function releaseFocusedMission() {
 
   mission.status = "released";
   saveGame3State();
+  trackEvent("mission_released", {
+    released_today: snapshot.tasks.filter((task) => task.status === "released").length,
+  });
   state.game3.focusMissionId = null;
   state.game3.hasStartedMission = false;
   state.game3.holdProgress = 0;
@@ -2607,6 +3309,11 @@ function addGame3Missions() {
     state.game3.schedule[day],
     parsed,
   );
+  trackEvent("weekly_plan_updated", {
+    day_id: day,
+    added_count: parsed.length,
+    total_count: state.game3.schedule[day].length,
+  });
   state.game3.editorDraft = "";
 
   if (day === getTodayDayId()) {
@@ -2669,6 +3376,10 @@ function loadGame3DemoForToday() {
       : ["Drink a glass of water", "Clean one surface", "Start the next important action"];
   syncTodaySnapshot();
   saveGame3State();
+  trackEvent("demo_route_loaded", {
+    day_id: todayId,
+    total_count: state.game3.schedule[todayId].length,
+  });
   render();
 }
 
